@@ -1,40 +1,43 @@
 document.addEventListener("DOMContentLoaded", () => {
     const container = document.querySelector(".items");
-    const items = document.querySelectorAll(".item");
-    
-    let selectedItem = null;
+    const cubes = document.querySelectorAll(".item");
+    let selectedCube = null;
     let offsetX = 0, offsetY = 0;
-    
-    items.forEach(item => {
-        item.addEventListener("mousedown", (e) => {
-            selectedItem = e.target;
-            const rect = selectedItem.getBoundingClientRect();
-            offsetX = e.clientX - rect.left;
-            offsetY = e.clientY - rect.top;
-            selectedItem.style.zIndex = 1000; // Bring to front
+
+    cubes.forEach(cube => {
+        cube.addEventListener("mousedown", (event) => {
+            selectedCube = cube;
+            const rect = cube.getBoundingClientRect();
+            offsetX = event.clientX - rect.left;
+            offsetY = event.clientY - rect.top;
+            cube.style.position = "absolute";
+            cube.style.zIndex = "1000";
         });
     });
-    
-    document.addEventListener("mousemove", (e) => {
-        if (!selectedItem) return;
-        
+
+    document.addEventListener("mousemove", (event) => {
+        if (!selectedCube) return;
+
+        let x = event.clientX - offsetX;
+        let y = event.clientY - offsetY;
+
         const containerRect = container.getBoundingClientRect();
-        let newX = e.clientX - containerRect.left - offsetX;
-        let newY = e.clientY - containerRect.top - offsetY;
-        
-        // Boundary constraints
-        newX = Math.max(0, Math.min(containerRect.width - selectedItem.clientWidth, newX));
-        newY = Math.max(0, Math.min(containerRect.height - selectedItem.clientHeight, newY));
-        
-        selectedItem.style.position = "absolute";
-        selectedItem.style.left = `${newX}px`;
-        selectedItem.style.top = `${newY}px`;
+        const cubeRect = selectedCube.getBoundingClientRect();
+
+        // Ensure cube stays within boundaries
+        if (x < containerRect.left) x = containerRect.left;
+        if (y < containerRect.top) y = containerRect.top;
+        if (x + cubeRect.width > containerRect.right) x = containerRect.right - cubeRect.width;
+        if (y + cubeRect.height > containerRect.bottom) y = containerRect.bottom - cubeRect.height;
+
+        selectedCube.style.left = `${x}px`;
+        selectedCube.style.top = `${y}px`;
     });
-    
+
     document.addEventListener("mouseup", () => {
-        if (selectedItem) {
-            selectedItem.style.zIndex = 1;
-            selectedItem = null;
+        if (selectedCube) {
+            selectedCube.style.zIndex = "1";
+            selectedCube = null;
         }
     });
 });
